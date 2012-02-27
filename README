@@ -1,0 +1,12 @@
+------------------------------------------------------------------------------
+                Bayes-GLib - Bayesian Classification for GLib
+------------------------------------------------------------------------------
+
+This is a simple attempt at making a classifier that can be used to train and
+learn about data used within a given domain. It exists mostly so that I can
+learn how to write a Bayesian classifier. Alternatively, it might prove useful
+to be able to use the same classification API from multiple languages through
+the powerful use of GObject Introspection.
+
+-- Christian
+

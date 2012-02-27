@@ -1,0 +1,49 @@
+-include $(top_srcdir)/Makefile.introspection
+
+headerdir = $(prefix)/include/bayes-glib-1.0/bayes-glib
+header_DATA = $(INST_H_FILES)
+
+lib_LTLIBRARIES =
+lib_LTLIBRARIES += libbayes-glib-1.0.la
+
+INST_H_FILES =
+INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-classifier.h
+INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-glib.h
+INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-storage.h
+INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-storage-memory.h
+
+NOINST_H_FILES =
+
+libbayes_glib_1_0_la_SOURCES =
+libbayes_glib_1_0_la_SOURCES += $(INST_H_FILES)
+libbayes_glib_1_0_la_SOURCES += $(NOINST_H_FILES)
+libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-classifier.c
+libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-storage.c
+libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-storage-memory.c
+
+libbayes_glib_1_0_la_CPPFLAGS =
+libbayes_glib_1_0_la_CPPFLAGS += $(GIO_CFLAGS)
+libbayes_glib_1_0_la_CPPFLAGS += $(GOBJECT_CFLAGS)
+
+libbayes_glib_1_0_la_LIBADD =
+libbayes_glib_1_0_la_LIBADD += $(GIO_LIBS)
+libbayes_glib_1_0_la_LIBADD += $(GOBJECT_LIBS)
+
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_srcdir)/bayes-glib --warn-all
+INTROSPECTION_COMPILER_ARGS = --includedir=$(top_srcdir)/bayes-glib
+
+Bayes-1.0.gir: libbayes-glib-1.0.la
+Bayes_1_0_gir_INCLUDES = Gio-2.0 GObject-2.0
+Bayes_1_0_gir_CFLAGS = 
+Bayes_1_0_gir_LIBS = libbayes-glib-1.0.la
+Bayes_1_0_gir_FILES = $(libbayes_glib_1_0_la_SOURCES)
+INTROSPECTION_GIRS += Bayes-1.0.gir
+
+girdir = $(datadir)/gir-1.0
+gir_DATA = $(INTROSPECTION_GIRS)
+
+typelibdir = $(libdir)/girepository-1.0
+typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+CLEANFILES = $(gir_DATA) $(typelib_DATA)
