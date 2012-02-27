@@ -29,10 +29,27 @@ G_DEFINE_TYPE_EXTENDED(BayesStorageMemory,
                        G_IMPLEMENT_INTERFACE(BAYES_TYPE_STORAGE,
                                              bayes_storage_init))
 
+typedef struct
+{
+   guint64 count;
+   GHashTable *tokens;
+} Tokens;
+
 struct _BayesStorageMemoryPrivate
 {
    GHashTable *classes;
 };
+
+static void
+tokens_free (gpointer data)
+{
+   Tokens *tokens = data;
+
+   if (tokens) {
+      g_hash_table_unref(tokens->tokens);
+      g_free(tokens);
+   }
+}
 
 /**
  * bayes_storage_memory_new:
@@ -55,7 +72,7 @@ bayes_storage_memory_add_token (BayesStorage *storage,
 {
    BayesStorageMemoryPrivate *priv;
    BayesStorageMemory *memory = (BayesStorageMemory *)storage;
-   GHashTable *class_hash;
+   Tokens *tokens;
    guint *token_count;
 
    g_return_if_fail(BAYES_IS_STORAGE_MEMORY(memory));
@@ -67,24 +84,26 @@ bayes_storage_memory_add_token (BayesStorage *storage,
    /*
     * Get the classification hashtable or create it if necessary.
     */
-   if (!(class_hash = g_hash_table_lookup(priv->classes, class_name))) {
-      class_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                         g_free, g_free);
-      g_hash_table_insert(priv->classes, g_strdup(class_name), class_hash);
+   if (!(tokens = g_hash_table_lookup(priv->classes, class_name))) {
+      tokens = g_new0(Tokens, 1);
+      tokens->tokens = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                             g_free, g_free);
+      g_hash_table_insert(priv->classes, g_strdup(class_name), tokens);
    }
 
    /*
     * Get the container for the token count or create it if necessary.
     */
-   if (!(token_count = g_hash_table_lookup(class_hash, token))) {
+   if (!(token_count = g_hash_table_lookup(tokens->tokens, token))) {
       token_count = g_new0(guint, 1);
-      g_hash_table_insert(class_hash, g_strdup(token), token_count);
+      g_hash_table_insert(tokens->tokens, g_strdup(token), token_count);
    }
 
    /*
     * Increment the count of the token.
     */
    *token_count += count;
+   tokens->count += count;
 }
 
 static guint
@@ -94,17 +113,18 @@ bayes_storage_memory_get_token (BayesStorage *storage,
 {
    BayesStorageMemoryPrivate *priv;
    BayesStorageMemory *memory = (BayesStorageMemory *)storage;
-   GHashTable *class_hash;
+   Tokens *tokens;
    guint *token_count;
 
    g_return_val_if_fail(BAYES_IS_STORAGE_MEMORY(memory), 0);
    g_return_val_if_fail(class_name, 0);
-   g_return_val_if_fail(token, 0);
 
    priv = memory->priv;
 
-   if ((class_hash = g_hash_table_lookup(priv->classes, class_name))) {
-      if ((token_count = g_hash_table_lookup(class_hash, token))) {
+   if ((tokens = g_hash_table_lookup(priv->classes, class_name))) {
+      if (!token) {
+         return tokens->count;
+      } else if ((token_count = g_hash_table_lookup(tokens->tokens, token))) {
          return *token_count;
       }
    }
@@ -162,7 +182,7 @@ bayes_storage_memory_init (BayesStorageMemory *memory)
       g_hash_table_new_full(g_str_hash,
                             g_str_equal,
                             g_free,
-                            (GDestroyNotify)g_hash_table_unref);
+                            tokens_free);
 }
 
 static void

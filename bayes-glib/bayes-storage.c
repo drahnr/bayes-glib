@@ -30,6 +30,18 @@ bayes_storage_add_token (BayesStorage *storage,
                                                    count);
 }
 
+/**
+ * bayes_storage_get_token:
+ * @storage: (in): A #BayesStorage.
+ * @class_name: (in): The name of the classification to lookup.
+ * @token: (in) (allow-none): The token to check, or %NULL for all tokens.
+ *
+ * Retrieves the number of times @token has been found in the training
+ * data. If @token is %NULL, the count of all items in the classification
+ * will be retrieved.
+ *
+ * Returns: A #guint containing the count of all items.
+ */
 guint
 bayes_storage_get_token (BayesStorage *storage,
                          const gchar  *class_name,
