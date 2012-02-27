@@ -122,6 +122,10 @@ bayes_storage_memory_get_token (BayesStorage *storage,
 static void
 bayes_storage_memory_finalize (GObject *object)
 {
+   BayesStorageMemoryPrivate *priv = BAYES_STORAGE_MEMORY(object)->priv;
+
+   g_hash_table_unref(priv->classes);
+
    G_OBJECT_CLASS(bayes_storage_memory_parent_class)->finalize(object);
 }
 
