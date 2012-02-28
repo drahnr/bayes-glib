@@ -36,23 +36,32 @@ struct _BayesStorageIface
    GTypeInterface parent;
 
    /* interface methods */
-   void  (*add_token) (BayesStorage *storage,
-                       const gchar  *class_name,
-                       const gchar  *token,
-                       guint         count);
-   guint (*get_token) (BayesStorage *storage,
-                       const gchar  *class_name,
-                       const gchar  *token);
+   void    (*add_token_count)       (BayesStorage *storage,
+                                     const gchar  *class_name,
+                                     const gchar  *token,
+                                     guint         count);
+   guint   (*get_token_count)       (BayesStorage *storage,
+                                     const gchar  *class_name,
+                                     const gchar  *token);
+   gdouble (*get_token_probability) (BayesStorage *storage,
+                                     const gchar  *class_name,
+                                     const gchar  *token);
 };
 
-GType bayes_storage_get_type  (void) G_GNUC_CONST;
-void  bayes_storage_add_token (BayesStorage *storage,
-                               const gchar  *class_name,
-                               const gchar  *token,
-                               guint         count);
-guint bayes_storage_get_token (BayesStorage *storage,
-                               const gchar  *class_name,
-                               const gchar  *token);
+GType   bayes_storage_get_type              (void) G_GNUC_CONST;
+void    bayes_storage_add_token             (BayesStorage *storage,
+                                             const gchar  *class_name,
+                                             const gchar  *token);
+void    bayes_storage_add_token_count       (BayesStorage *storage,
+                                             const gchar  *class_name,
+                                             const gchar  *token,
+                                             guint         count);
+guint   bayes_storage_get_token_count       (BayesStorage *storage,
+                                             const gchar  *class_name,
+                                             const gchar  *token);
+gdouble bayes_storage_get_token_probability (BayesStorage *storage,
+                                             const gchar  *class_name,
+                                             const gchar  *token);
 
 G_END_DECLS
 

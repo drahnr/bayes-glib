@@ -82,8 +82,7 @@ bayes_classifier_train (BayesClassifier *classifier,
 
    if ((tokens = bayes_classifier_tokenize(classifier, text))) {
       for (i = 0; tokens[i]; i++) {
-         bayes_storage_add_token(priv->storage, "corpus", tokens[i], 1);
-         bayes_storage_add_token(priv->storage, class_name, tokens[i], 1);
+         bayes_storage_add_token(priv->storage, class_name, tokens[i]);
       }
       g_strfreev(tokens);
    }

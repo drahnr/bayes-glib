@@ -18,16 +18,43 @@
 
 #include "bayes-storage.h"
 
+/**
+ * bayes_storage_add_token_count:
+ * @storage: (in): A #BayesStorage.
+ * @class_name: (in): The classification to store the token in.
+ * @token: (in): The token to add.
+ * @count: (in): The count of times @token was found.
+ *
+ * This function will add a token to the storage, applying it to the given
+ * classification. @count should indiciate the number of times that the
+ * token was found.
+ */
+void
+bayes_storage_add_token_count (BayesStorage *storage,
+                               const gchar  *class_name,
+                               const gchar  *token,
+                               guint         count)
+{
+   BAYES_STORAGE_GET_INTERFACE(storage)->
+      add_token_count(storage, class_name, token, count);
+}
+
+/**
+ * bayes_storage_add_token:
+ * @storage: (in): A #BayesStorage.
+ * @class_name: (in): The classification to store the token in.
+ * @token: (in): The token to add.
+ *
+ * This function will add a token to the storage, applying it to the given
+ * classification.
+ */
 void
 bayes_storage_add_token (BayesStorage *storage,
                          const gchar  *class_name,
-                         const gchar  *token,
-                         guint         count)
+                         const gchar  *token)
 {
-   BAYES_STORAGE_GET_INTERFACE(storage)->add_token(storage,
-                                                   class_name,
-                                                   token,
-                                                   count);
+   BAYES_STORAGE_GET_INTERFACE(storage)->
+      add_token_count(storage, class_name, token, 1);
 }
 
 /**
@@ -43,13 +70,34 @@ bayes_storage_add_token (BayesStorage *storage,
  * Returns: A #guint containing the count of all items.
  */
 guint
-bayes_storage_get_token (BayesStorage *storage,
-                         const gchar  *class_name,
-                         const gchar  *token)
+bayes_storage_get_token_count (BayesStorage *storage,
+                               const gchar  *class_name,
+                               const gchar  *token)
 {
-   return BAYES_STORAGE_GET_INTERFACE(storage)->get_token(storage,
-                                                          class_name,
-                                                          token);
+   return BAYES_STORAGE_GET_INTERFACE(storage)->
+      get_token_count(storage, class_name, token);
+}
+
+/**
+ * bayes_storage_get_token_probability:
+ * @storage: (in): A #BayesStorage.
+ * @token: (in): The desired token.
+ *
+ * Checks to see the probability of a token being a given classification.
+ *
+ * Returns: A #gdouble between 0.0 and 1.0 containing the probability.
+ */
+gdouble
+bayes_storage_get_token_probability (BayesStorage *storage,
+                                     const gchar  *class_name,
+                                     const gchar  *token)
+{
+   g_return_val_if_fail(BAYES_IS_STORAGE(storage), 0.0);
+   g_return_val_if_fail(class_name, 0.0);
+   g_return_val_if_fail(token, 0.0);
+
+   return BAYES_STORAGE_GET_INTERFACE(storage)->
+      get_token_probability(storage, class_name, token);
 }
 
 GType
