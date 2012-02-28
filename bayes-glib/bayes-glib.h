@@ -20,6 +20,7 @@
 #define BAYES_GLIB_H
 
 #include "bayes-classifier.h"
+#include "bayes-guess.h"
 #include "bayes-storage.h"
 #include "bayes-storage-memory.h"
 
