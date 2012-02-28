@@ -148,7 +148,6 @@ bayes_storage_memory_get_token_count (BayesStorage *storage,
    guint *token_count;
 
    g_return_val_if_fail(BAYES_IS_STORAGE_MEMORY(memory), 0);
-   g_return_val_if_fail(class_name, 0);
 
    priv = memory->priv;
 
