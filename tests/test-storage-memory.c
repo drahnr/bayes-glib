@@ -18,7 +18,7 @@ test1 (void)
 }
 
 gint
-main (gint       argc,
+main (gint   argc,
       gchar *argv[])
 {
    g_test_init(&argc, &argv, NULL);
