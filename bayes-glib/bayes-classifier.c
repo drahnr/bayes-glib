@@ -19,6 +19,7 @@
 #include <glib/gi18n.h>
 
 #include "bayes-classifier.h"
+#include "bayes-guess.h"
 #include "bayes-storage-memory.h"
 
 G_DEFINE_TYPE(BayesClassifier, bayes_classifier, G_TYPE_OBJECT)
@@ -92,28 +93,25 @@ bayes_classifier_train (BayesClassifier *classifier,
  * bayes_classifier_guess:
  * @classifier: (in): A #BayesClassifier.
  * @text: (in): Text to tokenize and guess the classification.
- * @accuracy: (out): A location for the accuracy of the guess.
  *
  * Tries to guess the classification of @text by tokenizing the text
  * and testing against the classifiers that have been trained.
  *
  * @accuracy is set with the accuracy of the guess.
  *
- * Returns: The name of the classification and @accuracy is set.
+ * Returns: (transfer container) (element-type BayesGuess*): The guesses.
  */
-const gchar *
+GPtrArray *
 bayes_classifier_guess (BayesClassifier *classifier,
-                        const gchar     *text,
-                        gdouble         *accuracy)
+                        const gchar     *text)
 {
-   const gchar *ret = NULL;
+   GPtrArray *ret;
    gchar **tokens;
 
    g_return_val_if_fail(BAYES_IS_CLASSIFIER(classifier), NULL);
    g_return_val_if_fail(text, NULL);
-   g_return_val_if_fail(accuracy, NULL);
 
-   *accuracy = 0.0;
+   ret = g_ptr_array_new_with_free_func((GDestroyNotify)bayes_guess_unref);
    tokens = bayes_classifier_tokenize(classifier, text);
 
    /*

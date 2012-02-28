@@ -56,9 +56,8 @@ struct _BayesClassifierClass
 
 BayesStorage    *bayes_classifier_get_storage   (BayesClassifier *classifier);
 GType            bayes_classifier_get_type      (void) G_GNUC_CONST;
-const gchar     *bayes_classifier_guess         (BayesClassifier *classifier,
-                                                 const gchar     *text,
-                                                 gdouble         *accuracy);
+GPtrArray       *bayes_classifier_guess         (BayesClassifier *classifier,
+                                                 const gchar     *text);
 BayesClassifier *bayes_classifier_new           (void);
 void             bayes_classifier_set_storage   (BayesClassifier *classifier,
                                                  BayesStorage    *storage);

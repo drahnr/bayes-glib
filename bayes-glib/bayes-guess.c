@@ -25,16 +25,28 @@ struct _BayesGuess
    gchar *name;
 };
 
+/**
+ * bayes_guess_new:
+ * @name: (in): The name of the classification.
+ * @probability: (in): The probability of the classification.
+ *
+ * Creates a new #BayesGuess that is the probability of a given
+ * classification.
+ *
+ * Returns: (transfer full): A newly allocated #BayesGuess.
+ */
 BayesGuess *
 bayes_guess_new (const gchar *name,
                  gdouble      probability)
 {
    BayesGuess *guess;
 
+   g_return_val_if_fail(name, NULL);
+
    guess = g_slice_new0(BayesGuess);
    guess->ref_count = 1;
    guess->name = g_strdup(name);
-   guess->probability = probability;
+   guess->probability = CLAMP(probability, 0.0, 1.0);
 
    return guess;
 }
