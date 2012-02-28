@@ -189,15 +189,29 @@ bayes_tokenizer_word (BayesClassifier *classifier,
                       gpointer         user_data)
 {
    GMatchInfo *match_info;
-   gchar **ret = NULL;
+   GPtrArray *ret;
+   gchar **strv;
+   guint i;
 
-   if (g_regex_match_all(gWordRegex, text, 0, &match_info)) {
-      ret = g_match_info_fetch_all(match_info);
+   ret = g_ptr_array_new();
+
+   if (g_regex_match(gWordRegex, text, 0, &match_info)) {
+      while (g_match_info_matches(match_info)) {
+         strv = g_match_info_fetch_all(match_info);
+         for (i = 0; strv[i]; i++) {
+            g_ptr_array_add(ret, strv[i]);
+            strv[i] = NULL;
+         }
+         g_free(strv);
+         g_match_info_next(match_info, NULL);
+      }
    }
 
    g_match_info_free(match_info);
 
-   return ret;
+   g_ptr_array_add(ret, NULL);
+
+   return (gchar **)g_ptr_array_free(ret, FALSE);
 }
 
 /**
