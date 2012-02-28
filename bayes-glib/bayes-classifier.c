@@ -99,19 +99,18 @@ bayes_classifier_train (BayesClassifier *classifier,
  *
  * @accuracy is set with the accuracy of the guess.
  *
- * Returns: (transfer container) (element-type BayesGuess*): The guesses.
+ * Returns: (transfer full) (element-type BayesGuess*): The guesses.
  */
-GPtrArray *
+GList *
 bayes_classifier_guess (BayesClassifier *classifier,
                         const gchar     *text)
 {
-   GPtrArray *ret;
+   GList *ret = NULL;
    gchar **tokens;
 
    g_return_val_if_fail(BAYES_IS_CLASSIFIER(classifier), NULL);
    g_return_val_if_fail(text, NULL);
 
-   ret = g_ptr_array_new_with_free_func((GDestroyNotify)bayes_guess_unref);
    tokens = bayes_classifier_tokenize(classifier, text);
 
    /*
