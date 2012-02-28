@@ -1,8 +1,14 @@
 noinst_PROGRAMS =
+noinst_PROGRAMS += test-guess
 noinst_PROGRAMS += test-storage-memory
 
+TEST_PROGS += test-guess
 TEST_PROGS += test-storage-memory
 
 test_storage_memory_SOURCES = $(top_srcdir)/tests/test-storage-memory.c
 test_storage_memory_CPPFLAGS = $(GOBJECT_CFLAGS)
 test_storage_memory_LDADD = $(GOBJECT_LIBS) $(top_builddir)/libbayes-glib-1.0.la
+
+test_guess_SOURCES = $(top_srcdir)/tests/test-guess.c
+test_guess_CPPFLAGS = $(GOBJECT_CFLAGS)
+test_guess_LDADD = $(GOBJECT_LIBS) $(top_builddir)/libbayes-glib-1.0.la
