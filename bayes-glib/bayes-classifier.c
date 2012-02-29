@@ -54,6 +54,37 @@ enum
 static GParamSpec *gParamSpecs[LAST_PROP];
 static GRegex     *gWordRegex;
 
+static gchar **
+bayes_tokenizer_word (BayesClassifier *classifier,
+                      const gchar     *text,
+                      gpointer         user_data)
+{
+   GMatchInfo *match_info;
+   GPtrArray *ret;
+   gchar **strv;
+   guint i;
+
+   ret = g_ptr_array_new();
+
+   if (g_regex_match(gWordRegex, text, 0, &match_info)) {
+      while (g_match_info_matches(match_info)) {
+         strv = g_match_info_fetch_all(match_info);
+         for (i = 0; strv[i]; i++) {
+            g_ptr_array_add(ret, strv[i]);
+            strv[i] = NULL;
+         }
+         g_free(strv);
+         g_match_info_next(match_info, NULL);
+      }
+   }
+
+   g_match_info_free(match_info);
+
+   g_ptr_array_add(ret, NULL);
+
+   return (gchar **)g_ptr_array_free(ret, FALSE);
+}
+
 static gdouble
 bayes_classifier_robinson (BayesClassifier  *classifier,
                            BayesGuess      **guesses,
@@ -289,40 +320,31 @@ bayes_classifier_set_tokenizer (BayesClassifier *classifier,
       priv->token_notify(priv->token_user_data);
    }
 
-   priv->token_func = tokenizer;
-   priv->token_user_data = user_data;
-   priv->token_notify = notify;
+   priv->token_func = tokenizer ? tokenizer : bayes_tokenizer_word;
+   priv->token_user_data = tokenizer ? user_data : NULL;
+   priv->token_notify = tokenizer ? notify : NULL;
 }
 
-static gchar **
-bayes_tokenizer_word (BayesClassifier *classifier,
-                      const gchar     *text,
-                      gpointer         user_data)
+static void
+bayes_classifier_set_combiner (BayesClassifier *classifier,
+                               BayesCombiner    combiner,
+                               gpointer         user_data,
+                               GDestroyNotify   notify)
 {
-   GMatchInfo *match_info;
-   GPtrArray *ret;
-   gchar **strv;
-   guint i;
+   BayesClassifierPrivate *priv;
 
-   ret = g_ptr_array_new();
+   g_return_if_fail(BAYES_IS_CLASSIFIER(classifier));
+   g_return_if_fail(combiner);
 
-   if (g_regex_match(gWordRegex, text, 0, &match_info)) {
-      while (g_match_info_matches(match_info)) {
-         strv = g_match_info_fetch_all(match_info);
-         for (i = 0; strv[i]; i++) {
-            g_ptr_array_add(ret, strv[i]);
-            strv[i] = NULL;
-         }
-         g_free(strv);
-         g_match_info_next(match_info, NULL);
-      }
+   priv = classifier->priv;
+
+   if (priv->combiner_notify) {
+      priv->combiner_notify(priv->combiner_user_data);
    }
 
-   g_match_info_free(match_info);
-
-   g_ptr_array_add(ret, NULL);
-
-   return (gchar **)g_ptr_array_free(ret, FALSE);
+   priv->combiner_func = combiner ? combiner : bayes_classifier_robinson;
+   priv->combiner_user_data = combiner ? user_data : NULL;
+   priv->combiner_notify = combiner ? notify : NULL;
 }
 
 /**
@@ -335,6 +357,12 @@ bayes_tokenizer_word (BayesClassifier *classifier,
 static void
 bayes_classifier_finalize (GObject *object)
 {
+   BayesClassifier *classifier = (BayesClassifier *)object;
+
+   bayes_classifier_set_tokenizer(classifier, NULL, NULL, NULL);
+   bayes_classifier_set_combiner(classifier, NULL, NULL, NULL);
+   g_clear_object(&classifier->priv->storage);
+
    G_OBJECT_CLASS(bayes_classifier_parent_class)->finalize(object);
 }
 
@@ -442,7 +470,7 @@ bayes_classifier_init (BayesClassifier *classifier)
       G_TYPE_INSTANCE_GET_PRIVATE(classifier,
                                   BAYES_TYPE_CLASSIFIER,
                                   BayesClassifierPrivate);
-   classifier->priv->token_func = bayes_tokenizer_word;
-   classifier->priv->combiner_func = bayes_classifier_robinson;
+   bayes_classifier_set_tokenizer(classifier, NULL, NULL, NULL);
+   bayes_classifier_set_combiner(classifier, NULL, NULL, NULL);
    bayes_classifier_set_storage(classifier, NULL);
 }
