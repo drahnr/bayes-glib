@@ -18,6 +18,23 @@
 
 #include "bayes-guess.h"
 
+/**
+ * SECTION:bayes-guess
+ * @title: BayesGuess
+ * @short_description: An immutable structure containing a probability.
+ * @see_also: bayes_guess_get_name() bayes_guess_get_probability()
+ *
+ * #BayesGuess represents a guess at the classification of given input
+ * data. The guess also includes the probability calculated for the input
+ * being the classification. The guess structure contains the classification
+ * name and a probability between 0.0 and 1.0.
+ *
+ * The #BayesGuess structure is a reference counted #GBoxed type. You can
+ * reference the structure with bayes_guess_ref() and free the structure
+ * with bayes_guess_unref().
+ *
+ */
+
 struct _BayesGuess
 {
    volatile gint ref_count;
@@ -51,6 +68,14 @@ bayes_guess_new (const gchar *name,
    return guess;
 }
 
+/**
+ * bayes_guess_ref:
+ * @guess: (in): A #BayesGuess.
+ *
+ * Increments the reference count of @guess by one.
+ *
+ * Returns: The instance provided, @guess.
+ */
 BayesGuess *
 bayes_guess_ref (BayesGuess *guess)
 {
@@ -61,6 +86,13 @@ bayes_guess_ref (BayesGuess *guess)
    return guess;
 }
 
+/**
+ * bayes_guess_unref:
+ * @guess: (in): A #BayesGuess.
+ *
+ * Decrements the reference count of @guess by one. Once the reference count
+ * reaches zero, the structure and allocated resources are released.
+ */
 void
 bayes_guess_unref (BayesGuess *guess)
 {
@@ -73,6 +105,14 @@ bayes_guess_unref (BayesGuess *guess)
    }
 }
 
+/**
+ * bayes_guess_get_name:
+ * @guess: (in): A #BayesGuess.
+ *
+ * Retrieves the classification name for which this guess represents.
+ *
+ * Returns: A string which should not be modified or freed.
+ */
 const gchar *
 bayes_guess_get_name (BayesGuess *guess)
 {
@@ -80,6 +120,15 @@ bayes_guess_get_name (BayesGuess *guess)
    return guess->name;
 }
 
+/**
+ * bayes_guess_get_probability:
+ * @guess: (in): A #BayesGuess.
+ *
+ * Retrieves the probability that the input data matches the classification
+ * this guess represents.
+ *
+ * Returns: A #gdouble between 0.0 and 1.0.
+ */
 gdouble
 bayes_guess_get_probability (BayesGuess *guess)
 {
