@@ -23,6 +23,21 @@
 #include "bayes-guess.h"
 #include "bayes-storage-memory.h"
 
+/**
+ * SECTION:bayes-classifier
+ * @title: BayesClassifier
+ * @short_description: Bayesian classifier for textual data.
+ *
+ * #BayesClassifier provides a simple API for classifying textual data.
+ * It can be trained using classified input data and then asked to classify
+ * input data of unknown classification.
+ *
+ * The tokenization of the input data can be changed to suit your desired
+ * needs. For example, it could be used to train SPAM vs HAM, or perhaps
+ * even guess if your boyfriend or girlfriend will react negatively to your
+ * instant message.
+ */
+
 G_DEFINE_TYPE(BayesClassifier, bayes_classifier, G_TYPE_OBJECT)
 
 typedef gdouble (*BayesCombiner) (BayesClassifier  *classifier,
@@ -198,14 +213,19 @@ bayes_classifier_combiner (BayesClassifier  *classifier,
  * @classifier: (in): A #BayesClassifier.
  * @text: (in): Text to tokenize and guess the classification.
  *
- * Tries to guess the classification of @text by tokenizing the text
- * and testing against the classifiers that have been trained.
+ * Tries to guess the classification of @text by tokenizing @text using
+ * the tokenizer provided to bayes_classifier_set_tokenizer()
+ * and testing each token against the classifiers training.
  *
- * The caller is responsible for freeing the guess structures and the
- * container list.
+ * This method returns a #GList of #BayesGuess instances. It is up to the
+ * caller to free the individual #BayesGuess structures as well as the
+ * containing #GList.
  *
+ * [[
+ * GList *list = bayes_classifier_guess(classifier, "who am i?");
  * g_list_foreach(list, (GFunc)bayes_guess_unref);
  * g_list_free(list);
+ * ]]
  *
  * Returns: (transfer full) (element-type BayesGuess*): The guesses.
  */
@@ -230,10 +250,6 @@ bayes_classifier_guess (BayesClassifier *classifier,
 
    tokens = bayes_classifier_tokenize(classifier, text);
    names = bayes_storage_get_class_names(priv->storage);
-
-   /*
-    * TODO: Uh, everything.
-    */
 
    for (i = 0; names[i]; i++) {
       guesses = g_ptr_array_new_with_free_func((GDestroyNotify)bayes_guess_unref);
@@ -303,6 +319,17 @@ bayes_classifier_set_storage (BayesClassifier *classifier,
                            : bayes_storage_memory_new();
 }
 
+/**
+ * bayes_classifier_set_tokenizer:
+ * @classifier: (in): A #BayesClassifier.
+ * @tokenizer: (in): A #BayesTokenizer.
+ * @user_data: (in): User data for @tokenizer.
+ * @notify: (in): Destruction notification for @user_data.
+ *
+ * Sets the tokenizer to use to tokenize input text by @classifer for
+ * both training using bayes_classifier_train() and guessing using
+ * bayes_classifier_guess().
+ */
 void
 bayes_classifier_set_tokenizer (BayesClassifier *classifier,
                                 BayesTokenizer   tokenizer,
@@ -351,8 +378,7 @@ bayes_classifier_set_combiner (BayesClassifier *classifier,
  * bayes_classifier_finalize:
  * @object: (in): A #BayesClassifier.
  *
- * Finalizer for a #BayesClassifier instance. Frees any resources held by
- * the instance.
+ * Free any resources held by the instance.
  */
 static void
 bayes_classifier_finalize (GObject *object)
@@ -439,7 +465,8 @@ bayes_classifier_class_init (BayesClassifierClass *klass)
    /**
     * BayesClassifier:storage:
     *
-    * The "storage" property. The token state is stored using @storage.
+    * The "storage" property. The training data used by @classifier is
+    * saved to and loaded from @storage.
     */
    gParamSpecs[PROP_STORAGE] =
       g_param_spec_object("storage",
