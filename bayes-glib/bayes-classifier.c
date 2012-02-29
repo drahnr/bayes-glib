@@ -17,6 +17,7 @@
  */
 
 #include <glib/gi18n.h>
+#include <math.h>
 
 #include "bayes-classifier.h"
 #include "bayes-guess.h"

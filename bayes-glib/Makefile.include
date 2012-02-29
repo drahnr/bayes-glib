@@ -30,6 +30,7 @@ libbayes_glib_1_0_la_CPPFLAGS += $(GOBJECT_CFLAGS)
 libbayes_glib_1_0_la_LIBADD =
 libbayes_glib_1_0_la_LIBADD += $(GIO_LIBS)
 libbayes_glib_1_0_la_LIBADD += $(GOBJECT_LIBS)
+libbayes_glib_1_0_la_LIBADD += -lm
 
 INTROSPECTION_GIRS =
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(top_srcdir)/bayes-glib --warn-all
