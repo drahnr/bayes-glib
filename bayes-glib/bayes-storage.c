@@ -21,7 +21,7 @@
 /**
  * SECTION:bayes-storage
  * @title: BayesStorage
- * @short_title: Interface for storing training data.
+ * @short_description: Interface for storing training data.
  *
  * The #BayesStorage interface provides a common interface for storing
  * training data for the classifier.
