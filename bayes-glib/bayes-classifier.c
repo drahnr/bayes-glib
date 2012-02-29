@@ -54,6 +54,39 @@ enum
 static GParamSpec *gParamSpecs[LAST_PROP];
 static GRegex     *gWordRegex;
 
+static gdouble
+bayes_classifier_robinson (BayesClassifier  *classifier,
+                           BayesGuess      **guesses,
+                           guint             len,
+                           const gchar      *class_name,
+                           gpointer          user_data)
+{
+   gdouble nth;
+   gdouble P;
+   gdouble Q;
+   gdouble S;
+   gdouble v;
+   gdouble w;
+   gdouble g;
+   guint i;
+
+   nth = 1.0 / (gdouble)len;
+
+   v = 1.0;
+   w = 1.0;
+   for (i = 0; i < len; i++) {
+      g = bayes_guess_get_probability(guesses[i]);
+      v *= (1.0 - g);
+      w *= g;
+   }
+
+   P = 1.0 - pow(v, nth);
+   Q = 1.0 - pow(w, nth);
+   S = (P - Q) / (P + Q);
+
+   return (1 + S) / 2.0;
+}
+
 static gchar **
 bayes_classifier_tokenize (BayesClassifier *classifier,
                            const gchar     *text)
@@ -410,5 +443,6 @@ bayes_classifier_init (BayesClassifier *classifier)
                                   BAYES_TYPE_CLASSIFIER,
                                   BayesClassifierPrivate);
    classifier->priv->token_func = bayes_tokenizer_word;
+   classifier->priv->combiner_func = bayes_classifier_robinson;
    bayes_classifier_set_storage(classifier, NULL);
 }
