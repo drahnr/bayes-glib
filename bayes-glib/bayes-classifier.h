@@ -22,6 +22,7 @@
 #include <glib-object.h>
 
 #include "bayes-storage.h"
+#include "bayes-tokenizer.h"
 
 G_BEGIN_DECLS
 
@@ -36,10 +37,6 @@ G_BEGIN_DECLS
 typedef struct _BayesClassifier        BayesClassifier;
 typedef struct _BayesClassifierClass   BayesClassifierClass;
 typedef struct _BayesClassifierPrivate BayesClassifierPrivate;
-
-typedef gchar **(*BayesTokenizer) (BayesClassifier *classifier,
-                                   const gchar     *text,
-                                   gpointer         user_data);
 
 struct _BayesClassifier
 {

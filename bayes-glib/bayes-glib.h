@@ -23,5 +23,6 @@
 #include "bayes-guess.h"
 #include "bayes-storage.h"
 #include "bayes-storage-memory.h"
+#include "bayes-tokenizer.h"
 
 #endif /* BAYES_GLIB_H */

@@ -42,6 +42,7 @@
     <xi:include href="xml/bayes-guess.xml"/>
     <xi:include href="xml/bayes-storage.xml"/>
     <xi:include href="xml/bayes-storage-memory.xml"/>
+    <xi:include href="xml/bayes-tokenizer.xml"/>
   </chapter>
 
   <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>

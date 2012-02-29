@@ -22,6 +22,7 @@
 #include "bayes-classifier.h"
 #include "bayes-guess.h"
 #include "bayes-storage-memory.h"
+#include "bayes-tokenizer.h"
 
 /**
  * SECTION:bayes-classifier
@@ -67,38 +68,6 @@ enum
 };
 
 static GParamSpec *gParamSpecs[LAST_PROP];
-static GRegex     *gWordRegex;
-
-static gchar **
-bayes_tokenizer_word (BayesClassifier *classifier,
-                      const gchar     *text,
-                      gpointer         user_data)
-{
-   GMatchInfo *match_info;
-   GPtrArray *ret;
-   gchar **strv;
-   guint i;
-
-   ret = g_ptr_array_new();
-
-   if (g_regex_match(gWordRegex, text, 0, &match_info)) {
-      while (g_match_info_matches(match_info)) {
-         strv = g_match_info_fetch_all(match_info);
-         for (i = 0; strv[i]; i++) {
-            g_ptr_array_add(ret, strv[i]);
-            strv[i] = NULL;
-         }
-         g_free(strv);
-         g_match_info_next(match_info, NULL);
-      }
-   }
-
-   g_match_info_free(match_info);
-
-   g_ptr_array_add(ret, NULL);
-
-   return (gchar **)g_ptr_array_free(ret, FALSE);
-}
 
 static gdouble
 bayes_classifier_robinson (BayesClassifier  *classifier,
@@ -143,7 +112,7 @@ bayes_classifier_tokenize (BayesClassifier *classifier,
    g_return_val_if_fail(text, NULL);
 
    priv = classifier->priv;
-   return priv->token_func(classifier, text, priv->token_user_data);
+   return priv->token_func(text, priv->token_user_data);
 }
 
 /**
@@ -472,7 +441,6 @@ static void
 bayes_classifier_class_init (BayesClassifierClass *klass)
 {
    GObjectClass *object_class;
-   GError *error = NULL;
 
    object_class = G_OBJECT_CLASS(klass);
    object_class->finalize = bayes_classifier_finalize;
@@ -494,12 +462,6 @@ bayes_classifier_class_init (BayesClassifierClass *klass)
                           G_PARAM_READWRITE);
    g_object_class_install_property(object_class, PROP_STORAGE,
                                    gParamSpecs[PROP_STORAGE]);
-
-   if (!(gWordRegex = g_regex_new("\\w+", 0, 0, &error))) {
-      g_error("%s", error->message);
-      g_error_free(error);
-      g_assert(FALSE);
-   }
 }
 
 /**

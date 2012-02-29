@@ -12,6 +12,7 @@ INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-glib.h
 INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-guess.h
 INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-storage.h
 INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-storage-memory.h
+INST_H_FILES += $(top_srcdir)/bayes-glib/bayes-tokenizer.h
 
 NOINST_H_FILES =
 
@@ -22,6 +23,7 @@ libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-classifier.c
 libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-guess.c
 libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-storage.c
 libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-storage-memory.c
+libbayes_glib_1_0_la_SOURCES += $(top_srcdir)/bayes-glib/bayes-tokenizer.c
 
 libbayes_glib_1_0_la_CPPFLAGS =
 libbayes_glib_1_0_la_CPPFLAGS += $(GIO_CFLAGS)
