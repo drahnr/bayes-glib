@@ -3,6 +3,8 @@ include Makefile.tests
 include bayes-glib/Makefile.include
 include tests/Makefile.include
 
+SUBDIRS = . doc
+
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 DISTCHECK_CONFIGURE_FLAGS =

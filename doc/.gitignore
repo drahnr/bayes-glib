@@ -1,0 +1,7 @@
+*.txt
+*.stamp
+bayes-glib.*
+html
+tmpl
+version.xml
+xml

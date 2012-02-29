@@ -139,6 +139,8 @@ dnl **************************************************************************
 AC_CONFIG_FILES([
 	Makefile
 	bayes-glib-1.0.pc
+	doc/Makefile
+	doc/version.xml
 ])
 AC_OUTPUT
 
