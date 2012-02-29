@@ -25,6 +25,12 @@
 
 G_DEFINE_TYPE(BayesClassifier, bayes_classifier, G_TYPE_OBJECT)
 
+typedef gdouble (*BayesCombiner) (BayesClassifier  *classifier,
+                                  BayesGuess      **guesses,
+                                  guint             len,
+                                  const gchar      *class_name,
+                                  gpointer          user_data);
+
 struct _BayesClassifierPrivate
 {
    BayesStorage *storage;
@@ -32,6 +38,10 @@ struct _BayesClassifierPrivate
    BayesTokenizer token_func;
    gpointer       token_user_data;
    GDestroyNotify token_notify;
+
+   BayesCombiner  combiner_func;
+   gpointer       combiner_user_data;
+   GDestroyNotify combiner_notify;
 };
 
 enum
@@ -90,6 +100,35 @@ bayes_classifier_train (BayesClassifier *classifier,
    }
 }
 
+static gint
+sort_guesses (gconstpointer a,
+              gconstpointer b)
+{
+   BayesGuess *ag = (gpointer)a;
+   BayesGuess *bg = (gpointer)b;
+   return (bayes_guess_get_probability(bg) -
+           bayes_guess_get_probability(ag))
+      * 100.0;
+}
+
+static gdouble
+bayes_classifier_combiner (BayesClassifier  *classifier,
+                           BayesGuess      **guesses,
+                           guint             len,
+                           const gchar      *class_name)
+{
+   g_return_val_if_fail(BAYES_IS_CLASSIFIER(classifier), 0.0);
+   g_return_val_if_fail(guesses, 0.0);
+   g_return_val_if_fail(len, 0.0);
+   g_return_val_if_fail(class_name, 0.0);
+
+   return classifier->priv->combiner_func(classifier,
+                                          guesses,
+                                          len,
+                                          class_name,
+                                          classifier->priv->combiner_user_data);
+}
+
 /**
  * bayes_classifier_guess:
  * @classifier: (in): A #BayesClassifier.
@@ -98,7 +137,11 @@ bayes_classifier_train (BayesClassifier *classifier,
  * Tries to guess the classification of @text by tokenizing the text
  * and testing against the classifiers that have been trained.
  *
- * @accuracy is set with the accuracy of the guess.
+ * The caller is responsible for freeing the guess structures and the
+ * container list.
+ *
+ * g_list_foreach(list, (GFunc)bayes_guess_unref);
+ * g_list_free(list);
  *
  * Returns: (transfer full) (element-type BayesGuess*): The guesses.
  */
@@ -106,19 +149,53 @@ GList *
 bayes_classifier_guess (BayesClassifier *classifier,
                         const gchar     *text)
 {
-   GList *ret = NULL;
+   BayesClassifierPrivate *priv;
+   BayesGuess *guess;
+   GPtrArray *guesses;
+   gdouble prob;
    gchar **tokens;
+   gchar **names;
+   GList *ret = NULL;
+   guint i;
+   guint j;
 
    g_return_val_if_fail(BAYES_IS_CLASSIFIER(classifier), NULL);
    g_return_val_if_fail(text, NULL);
 
+   priv = classifier->priv;
+
    tokens = bayes_classifier_tokenize(classifier, text);
+   names = bayes_storage_get_class_names(priv->storage);
 
    /*
     * TODO: Uh, everything.
     */
 
+   for (i = 0; names[i]; i++) {
+      guesses = g_ptr_array_new_with_free_func((GDestroyNotify)bayes_guess_unref);
+      for (j = 0; tokens[j]; j++) {
+         prob = bayes_storage_get_token_probability(priv->storage,
+                                                    names[i],
+                                                    tokens[j]);
+         guess = bayes_guess_new(tokens[j], prob);
+         g_ptr_array_add(guesses, guess);
+      }
+      g_ptr_array_sort(guesses, sort_guesses);
+      if (guesses->len) {
+         guess = bayes_guess_new(names[i],
+                                 bayes_classifier_combiner(classifier,
+                                                           (BayesGuess **)guesses->pdata,
+                                                           guesses->len,
+                                                           names[i]));
+         ret = g_list_prepend(ret, guess);
+      }
+      g_ptr_array_unref(guesses);
+   }
+
+   g_strfreev(names);
    g_strfreev(tokens);
+
+   ret = g_list_sort(ret, sort_guesses);
 
    return ret;
 }
