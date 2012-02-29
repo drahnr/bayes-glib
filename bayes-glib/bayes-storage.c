@@ -21,7 +21,7 @@
 /**
  * bayes_storage_add_token_count:
  * @storage: (in): A #BayesStorage.
- * @class_name: (in): The classification to store the token in.
+ * @name: (in): The classification to store the token in.
  * @token: (in): The token to add.
  * @count: (in): The count of times @token was found.
  *
@@ -31,23 +31,23 @@
  */
 void
 bayes_storage_add_token_count (BayesStorage *storage,
-                               const gchar  *class_name,
+                               const gchar  *name,
                                const gchar  *token,
                                guint         count)
 {
    g_return_if_fail(BAYES_IS_STORAGE(storage));
-   g_return_if_fail(class_name);
+   g_return_if_fail(name);
    g_return_if_fail(token);
    g_return_if_fail(count);
 
    BAYES_STORAGE_GET_INTERFACE(storage)->
-      add_token_count(storage, class_name, token, count);
+      add_token_count(storage, name, token, count);
 }
 
 /**
  * bayes_storage_add_token:
  * @storage: (in): A #BayesStorage.
- * @class_name: (in): The classification to store the token in.
+ * @name: (in): The classification to store the token in.
  * @token: (in): The token to add.
  *
  * This function will add a token to the storage, applying it to the given
@@ -55,19 +55,19 @@ bayes_storage_add_token_count (BayesStorage *storage,
  */
 void
 bayes_storage_add_token (BayesStorage *storage,
-                         const gchar  *class_name,
+                         const gchar  *name,
                          const gchar  *token)
 {
    g_return_if_fail(BAYES_IS_STORAGE(storage));
-   g_return_if_fail(class_name);
+   g_return_if_fail(name);
    g_return_if_fail(token);
 
    BAYES_STORAGE_GET_INTERFACE(storage)->
-      add_token_count(storage, class_name, token, 1);
+      add_token_count(storage, name, token, 1);
 }
 
 /**
- * bayes_storage_get_class_names:
+ * bayes_storage_get_names:
  * @storage: (in): A #BayesStorage.
  *
  * Retrieves the names of the classifications trained in this storage
@@ -76,41 +76,41 @@ bayes_storage_add_token (BayesStorage *storage,
  * Returns: (transfer full): A #GStrv of class names.
  */
 gchar **
-bayes_storage_get_class_names (BayesStorage *storage)
+bayes_storage_get_names (BayesStorage *storage)
 {
    g_return_val_if_fail(BAYES_IS_STORAGE(storage), NULL);
-   return BAYES_STORAGE_GET_INTERFACE(storage)->get_class_names(storage);
+   return BAYES_STORAGE_GET_INTERFACE(storage)->get_names(storage);
 }
 
 /**
  * bayes_storage_get_token_count:
  * @storage: (in): A #BayesStorage.
- * @class_name: (in) (allow-none): The classification or %NULL for all.
+ * @name: (in) (allow-none): The classification or %NULL for all.
  * @token: (in) (allow-none): The token or %NULL for all.
  *
  * Retrieves the number of times @token has been found in the training
  * data. If @token is %NULL, the count of all items in the classification
- * will be retrieved. If @class_name is %NULL, then the count of all the
+ * will be retrieved. If @name is %NULL, then the count of all the
  * instances of @token in the all the classifications.
  *
  * Returns: A #guint containing the count of all items.
  */
 guint
 bayes_storage_get_token_count (BayesStorage *storage,
-                               const gchar  *class_name,
+                               const gchar  *name,
                                const gchar  *token)
 {
    g_return_val_if_fail(BAYES_IS_STORAGE(storage), 0);
-   g_return_val_if_fail(class_name || token, 0);
+   g_return_val_if_fail(name || token, 0);
 
    return BAYES_STORAGE_GET_INTERFACE(storage)->
-      get_token_count(storage, class_name, token);
+      get_token_count(storage, name, token);
 }
 
 /**
  * bayes_storage_get_token_probability:
  * @storage: (in): A #BayesStorage.
- * @class_name: (in): The classification.
+ * @name: (in): The classification.
  * @token: (in): The desired token.
  *
  * Checks to see the probability of a token being a given classification.
@@ -119,15 +119,15 @@ bayes_storage_get_token_count (BayesStorage *storage,
  */
 gdouble
 bayes_storage_get_token_probability (BayesStorage *storage,
-                                     const gchar  *class_name,
+                                     const gchar  *name,
                                      const gchar  *token)
 {
    g_return_val_if_fail(BAYES_IS_STORAGE(storage), 0.0);
-   g_return_val_if_fail(class_name, 0.0);
+   g_return_val_if_fail(name, 0.0);
    g_return_val_if_fail(token, 0.0);
 
    return BAYES_STORAGE_GET_INTERFACE(storage)->
-      get_token_probability(storage, class_name, token);
+      get_token_probability(storage, name, token);
 }
 
 GType

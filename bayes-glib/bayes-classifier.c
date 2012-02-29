@@ -43,7 +43,7 @@ G_DEFINE_TYPE(BayesClassifier, bayes_classifier, G_TYPE_OBJECT)
 typedef gdouble (*BayesCombiner) (BayesClassifier  *classifier,
                                   BayesGuess      **guesses,
                                   guint             len,
-                                  const gchar      *class_name,
+                                  const gchar      *name,
                                   gpointer          user_data);
 
 struct _BayesClassifierPrivate
@@ -104,7 +104,7 @@ static gdouble
 bayes_classifier_robinson (BayesClassifier  *classifier,
                            BayesGuess      **guesses,
                            guint             len,
-                           const gchar      *class_name,
+                           const gchar      *name,
                            gpointer          user_data)
 {
    gdouble nth;
@@ -167,16 +167,16 @@ bayes_classifier_new (void)
 /**
  * bayes_classifier_train:
  * @classifier: (in): A #BayesClassifier.
- * @class_name: (in): The classification for @text.
+ * @name: (in): The classification for @text.
  * @text: (in): Text to tokenize and store for guessing.
  *
  * Tokenizes @text and stores the values under the classification named
- * @class_name. These are used by bayes_classifier_guess() to determine
+ * @name. These are used by bayes_classifier_guess() to determine
  * the classification.
  */
 void
 bayes_classifier_train (BayesClassifier *classifier,
-                        const gchar     *class_name,
+                        const gchar     *name,
                         const gchar     *text)
 {
    BayesClassifierPrivate *priv;
@@ -184,14 +184,14 @@ bayes_classifier_train (BayesClassifier *classifier,
    guint i;
 
    g_return_if_fail(BAYES_IS_CLASSIFIER(classifier));
-   g_return_if_fail(class_name);
+   g_return_if_fail(name);
    g_return_if_fail(text);
 
    priv = classifier->priv;
 
    if ((tokens = bayes_classifier_tokenize(classifier, text))) {
       for (i = 0; tokens[i]; i++) {
-         bayes_storage_add_token(priv->storage, class_name, tokens[i]);
+         bayes_storage_add_token(priv->storage, name, tokens[i]);
       }
       g_strfreev(tokens);
    }
@@ -212,17 +212,17 @@ static gdouble
 bayes_classifier_combiner (BayesClassifier  *classifier,
                            BayesGuess      **guesses,
                            guint             len,
-                           const gchar      *class_name)
+                           const gchar      *name)
 {
    g_return_val_if_fail(BAYES_IS_CLASSIFIER(classifier), 0.0);
    g_return_val_if_fail(guesses, 0.0);
    g_return_val_if_fail(len, 0.0);
-   g_return_val_if_fail(class_name, 0.0);
+   g_return_val_if_fail(name, 0.0);
 
    return classifier->priv->combiner_func(classifier,
                                           guesses,
                                           len,
-                                          class_name,
+                                          name,
                                           classifier->priv->combiner_user_data);
 }
 
@@ -267,7 +267,7 @@ bayes_classifier_guess (BayesClassifier *classifier,
    priv = classifier->priv;
 
    tokens = bayes_classifier_tokenize(classifier, text);
-   names = bayes_storage_get_class_names(priv->storage);
+   names = bayes_storage_get_names(priv->storage);
 
    for (i = 0; names[i]; i++) {
       guesses = g_ptr_array_new_with_free_func((GDestroyNotify)bayes_guess_unref);

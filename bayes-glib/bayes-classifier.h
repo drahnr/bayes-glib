@@ -66,7 +66,7 @@ void             bayes_classifier_set_tokenizer (BayesClassifier *classifier,
                                                  gpointer         user_data,
                                                  GDestroyNotify   notify);
 void             bayes_classifier_train         (BayesClassifier *classifier,
-                                                 const gchar     *class_name,
+                                                 const gchar     *name,
                                                  const gchar     *text);
 
 G_END_DECLS
