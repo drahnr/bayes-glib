@@ -20,6 +20,18 @@
 
 #include "bayes-storage-memory.h"
 
+/**
+ * SECTION:bayes-storage-memory
+ * @title: BayesStorageMemory
+ * @short_description: Storage of training data in memory.
+ *
+ * #BayesStorageMemory is an implementation of #BayesStorage that
+ * stores the tokens and their associated counts in memory using
+ * #GHashTable. It is mean for smaller data sets and offers no
+ * storage of the training data to disk. It is mostly handy for
+ * just trying things out.
+ */
+
 static void bayes_storage_init (BayesStorageIface *iface);
 
 G_DEFINE_TYPE_EXTENDED(BayesStorageMemory,
@@ -65,14 +77,6 @@ bayes_storage_memory_new (void)
    return g_object_new(BAYES_TYPE_STORAGE_MEMORY, NULL);
 }
 
-/**
- * tokens_inc:
- * @tokens: A Tokens.
- * @token: The token to increment.
- * @count: The number of times to increment.
- *
- * Increment the token within the classification.
- */
 static void
 tokens_inc (Tokens      *tokens,
             const gchar *token,
@@ -95,15 +99,6 @@ tokens_inc (Tokens      *tokens,
    tokens->count += count;
 }
 
-/**
- * bayes_storage_memory_add_token_count:
- * @storage: (in): A #BayesStorageMemory.
- * @name: (in): A string containing the classification.
- * @token: (in): The token to add.
- * @count: (in): The number of times to add @token.
- *
- * Adds @token to the classification @name @count times.
- */
 static void
 bayes_storage_memory_add_token_count (BayesStorage *storage,
                                       const gchar  *name,
@@ -134,17 +129,6 @@ bayes_storage_memory_add_token_count (BayesStorage *storage,
    tokens_inc(priv->corpus, token, count);
 }
 
-/**
- * bayes_storage_memory_get_token_count:
- * @storage: (in): A #BayesStorageMemory.
- * @name: (in): A string containing a classification.
- * @token: (in): A string containing the token.
- *
- * Gets the count of times @token was found in the classification named
- * @name.
- *
- * Returns: a #guint containing the count of @token in the classification.
- */
 static guint
 bayes_storage_memory_get_token_count (BayesStorage *storage,
                                       const gchar  *name,
@@ -172,17 +156,6 @@ bayes_storage_memory_get_token_count (BayesStorage *storage,
    return 0;
 }
 
-/**
- * bayes_storage_memory_get_token_probability:
- * @storage: (in): A #BayesStorageMemory.
- * @name: (in): A string containing the classification name.
- * @token: (in): The token to calculate.
- *
- * Calculates the probability that @token indicates the guess of
- * @name classification.
- *
- * Returns: A #gdouble between 0.0 and 1.0.
- */
 static gdouble
 bayes_storage_memory_get_token_probability (BayesStorage *storage,
                                             const gchar  *name,
@@ -226,14 +199,6 @@ bayes_storage_memory_get_token_probability (BayesStorage *storage,
    return 0.0;
 }
 
-/**
- * bayes_storage_memory_get_names:
- * @memory: (in): A #BayesStorageMemory.
- *
- * Retrieves the class names trained in this storage instance.
- *
- * Returns: (transfer full): A newly allocated #GStrv.
- */
 static gchar **
 bayes_storage_memory_get_names (BayesStorage *storage)
 {
@@ -257,13 +222,6 @@ bayes_storage_memory_get_names (BayesStorage *storage)
    return (gchar **)g_ptr_array_free(ret, FALSE);
 }
 
-/**
- * bayes_storage_memory_finalize:
- * @object: (in): A #BayesStorageMemory.
- *
- * Finalizer for a #BayesStorageMemory instance. Frees any resources held by
- * the instance.
- */
 static void
 bayes_storage_memory_finalize (GObject *object)
 {
@@ -275,12 +233,6 @@ bayes_storage_memory_finalize (GObject *object)
    G_OBJECT_CLASS(bayes_storage_memory_parent_class)->finalize(object);
 }
 
-/**
- * bayes_storage_memory_class_init:
- * @klass: (in): A #BayesStorageMemoryClass.
- *
- * Initializes the #BayesStorageMemoryClass and prepares the vtable.
- */
 static void
 bayes_storage_memory_class_init (BayesStorageMemoryClass *klass)
 {
@@ -291,12 +243,6 @@ bayes_storage_memory_class_init (BayesStorageMemoryClass *klass)
    g_type_class_add_private(object_class, sizeof(BayesStorageMemoryPrivate));
 }
 
-/**
- * bayes_storage_memory_init:
- * @memory: (in): A #BayesStorageMemory.
- *
- * Initializes the newly created #BayesStorageMemory instance.
- */
 static void
 bayes_storage_memory_init (BayesStorageMemory *memory)
 {
