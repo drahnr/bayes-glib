@@ -15,3 +15,24 @@ I make no guarantees about maintaining this code.
 
 -- Christian
 
+
+------------------------------------------------------------------------------
+Examples
+------------------------------------------------------------------------------
+
+Python example
+
+>>> from gi.repository import Bayes
+>>> c = Bayes.Classifier()
+>>> c.train('french', 'le la les du un une je il elle de en')
+>>> c.train('german', 'der die das ein eine')
+>>> c.train('spanish', 'el uno una las de la en')
+>>> c.train('english', 'the it she he they them are were to')
+>>> for g in c.guess('they were flying planes'):
+...     print '%12s: %0.4f' % (g.get_name(), g.get_probability())
+...
+     english: 0.4975
+     spanish: 0.0000
+      french: 0.0000
+      german: 0.0000
+
