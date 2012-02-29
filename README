@@ -6,7 +6,12 @@ This is a simple attempt at making a classifier that can be used to train and
 learn about data used within a given domain. It exists mostly so that I can
 learn how to write a Bayesian classifier. Alternatively, it might prove useful
 to be able to use the same classification API from multiple languages through
-the powerful use of GObject Introspection.
+the GObject Introspection.
+
+Bits and pieces of this are based on the reverend.thomas python module. It,
+too, is licensed under the LGPL (2.1) by Amir Bakhtiar.
+
+I make no guarantees about maintaining this code.
 
 -- Christian
 

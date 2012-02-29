@@ -71,7 +71,7 @@ bayes_storage_add_token (BayesStorage *storage,
  * @storage: (in): A #BayesStorage.
  *
  * Retrieves the names of the classifications trained in this storage
- * instance.
+ * instance. The result should be freed with g_strfreev().
  *
  * Returns: (transfer full): A #GStrv of class names.
  */

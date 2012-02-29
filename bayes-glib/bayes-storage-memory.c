@@ -65,6 +65,14 @@ bayes_storage_memory_new (void)
    return g_object_new(BAYES_TYPE_STORAGE_MEMORY, NULL);
 }
 
+/**
+ * tokens_inc:
+ * @tokens: A Tokens.
+ * @token: The token to increment.
+ * @count: The number of times to increment.
+ *
+ * Increment the token within the classification.
+ */
 static void
 tokens_inc (Tokens      *tokens,
             const gchar *token,
