@@ -19,6 +19,17 @@
 #include "bayes-storage.h"
 
 /**
+ * SECTION:bayes-storage
+ * @title: BayesStorage
+ * @short_title: Interface for storing training data.
+ *
+ * The #BayesStorage interface provides a common interface for storing
+ * training data for the classifier.
+ *
+ * See #BayesStorageMemory for in memory storage of training data.
+ */
+
+/**
  * bayes_storage_add_token_count:
  * @storage: (in): A #BayesStorage.
  * @name: (in): The classification to store the token in.
