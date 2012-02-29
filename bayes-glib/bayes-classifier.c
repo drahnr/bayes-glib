@@ -147,6 +147,24 @@ bayes_classifier_tokenize (BayesClassifier *classifier,
 }
 
 /**
+ * bayes_classifier_new:
+ *
+ * Create a new instance of #BayesClassifier. The instance should be
+ * freed using g_object_unref().
+ *
+ * See bayes_classifier_train() for how to train your classifier.
+ * See bayes_classifier_guess() for guessing the classification of
+ * unknown input.
+ *
+ * Returns: (transfer full): A newly allocated #BayesClassifier.
+ */
+BayesClassifier *
+bayes_classifier_new (void)
+{
+   return g_object_new(BAYES_TYPE_CLASSIFIER, NULL);
+}
+
+/**
  * bayes_classifier_train:
  * @classifier: (in): A #BayesClassifier.
  * @class_name: (in): The classification for @text.
