@@ -357,7 +357,7 @@ bayes_classifier_set_tokenizer (BayesClassifier *classifier,
    BayesClassifierPrivate *priv;
 
    g_return_if_fail(BAYES_IS_CLASSIFIER(classifier));
-   g_return_if_fail(tokenizer);
+   g_return_if_fail(tokenizer || (!user_data && !notify));
 
    priv = classifier->priv;
 
@@ -379,7 +379,7 @@ bayes_classifier_set_combiner (BayesClassifier *classifier,
    BayesClassifierPrivate *priv;
 
    g_return_if_fail(BAYES_IS_CLASSIFIER(classifier));
-   g_return_if_fail(combiner);
+   g_return_if_fail(combiner || (!user_data && !notify));
 
    priv = classifier->priv;
 
