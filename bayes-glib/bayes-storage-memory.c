@@ -219,6 +219,37 @@ bayes_storage_memory_get_token_probability (BayesStorage *storage,
 }
 
 /**
+ * bayes_storage_memory_get_class_names:
+ * @memory: (in): A #BayesStorageMemory.
+ *
+ * Retrieves the class names trained in this storage instance.
+ *
+ * Returns: (transfer full): A newly allocated #GStrv.
+ */
+static gchar **
+bayes_storage_memory_get_class_names (BayesStorage *storage)
+{
+   BayesStorageMemoryPrivate *priv;
+   BayesStorageMemory *memory = (BayesStorageMemory *)storage;
+   GHashTableIter iter;
+   GPtrArray *ret;
+   gchar *key;
+
+   g_return_val_if_fail(BAYES_IS_STORAGE_MEMORY(memory), NULL);
+
+   priv = memory->priv;
+
+   ret = g_ptr_array_new();
+   g_hash_table_iter_init(&iter, priv->classes);
+   while (g_hash_table_iter_next(&iter, (gpointer *)&key, NULL)) {
+      g_ptr_array_add(ret, g_strdup(key));
+   }
+   g_ptr_array_add(ret, NULL);
+
+   return (gchar **)g_ptr_array_free(ret, FALSE);
+}
+
+/**
  * bayes_storage_memory_finalize:
  * @object: (in): A #BayesStorageMemory.
  *
@@ -282,6 +313,7 @@ static void
 bayes_storage_init (BayesStorageIface *iface)
 {
    iface->add_token_count = bayes_storage_memory_add_token_count;
+   iface->get_class_names = bayes_storage_memory_get_class_names;
    iface->get_token_count = bayes_storage_memory_get_token_count;
    iface->get_token_probability = bayes_storage_memory_get_token_probability;
 }
