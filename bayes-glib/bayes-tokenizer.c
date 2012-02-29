@@ -51,7 +51,7 @@ bayes_tokenizer_word (const gchar *text,
    guint i;
 
    if (g_once_init_enter(&initialized)) {
-      gWordRegex = g_regex_new("\\w+", 0, 0, NULL);
+      gWordRegex = g_regex_new("\\w+", G_REGEX_OPTIMIZE, 0, NULL);
       g_assert(gWordRegex);
       g_once_init_leave(&initialized, TRUE);
    }
