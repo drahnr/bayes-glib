@@ -293,7 +293,7 @@ bayes_storage_memory_class_init (BayesStorageMemoryClass *klass)
 
 /**
  * bayes_storage_memory_init:
- * @: (in): A #BayesStorageMemory.
+ * @memory: (in): A #BayesStorageMemory.
  *
  * Initializes the newly created #BayesStorageMemory instance.
  */
